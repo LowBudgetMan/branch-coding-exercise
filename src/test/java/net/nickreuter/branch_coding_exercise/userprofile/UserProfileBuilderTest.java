@@ -1,7 +1,9 @@
-package net.nickreuter.branch_coding_exercise.userprofile.domain;
+package net.nickreuter.branch_coding_exercise.userprofile;
 
 import net.nickreuter.branch_coding_exercise.github.domain.GitHubProfile;
 import net.nickreuter.branch_coding_exercise.github.domain.GitHubRepository;
+import net.nickreuter.branch_coding_exercise.userprofile.domain.CodeRepository;
+import net.nickreuter.branch_coding_exercise.userprofile.domain.UserProfile;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
@@ -10,8 +12,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class UserProfileTest {
-
+class UserProfileBuilderTest {
     @Test
     void fromGitHubProfile_WhenUserHasAllFields_ShouldReturnUserProfile() {
         var gitHubProfile = new GitHubProfile("octocat", URI.create("http://this.is.a/avatar-url"), URI.create("https://this.is.a/profile-url"), "The Octocat", "Detroit", "email@a.place", Instant.now());
@@ -23,7 +24,7 @@ class UserProfileTest {
         var expectedRepos = List.of(expectedRepo1, expectedRepo2);
         var expected = new UserProfile("octocat", "The Octocat", URI.create("http://this.is.a/avatar-url"), "Detroit", "email@a.place", URI.create("https://this.is.a/profile-url"), gitHubProfile.created_at(), expectedRepos);
 
-        var actual = UserProfile.fromGitHubProfile(gitHubProfile, gitHubRepos);
+        var actual = UserProfileBuilder.fromGitHubProfile(gitHubProfile, gitHubRepos);
 
         assertThat(actual).isEqualTo(expected);
     }

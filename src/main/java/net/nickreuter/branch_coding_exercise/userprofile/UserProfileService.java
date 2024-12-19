@@ -17,6 +17,6 @@ public class UserProfileService {
     public UserProfile getUserProfile(String username) throws UserProfileNotFoundException {
         var gitHubProfile = gitHubClient.getProfile(username).orElseThrow(UserProfileNotFoundException::new);
         var gitHubRepos = gitHubClient.getRepositoriesForUser(username);
-        return UserProfile.fromGitHubProfile(gitHubProfile, gitHubRepos);
+        return UserProfileBuilder.fromGitHubProfile(gitHubProfile, gitHubRepos);
     }
 }
