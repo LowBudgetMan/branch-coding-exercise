@@ -8,6 +8,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,21 +33,20 @@ public class GitHubClient {
                 .body(GitHubProfile.class));
         } catch(IllegalArgumentException e) {
             return Optional.empty();
-        } catch(RateLimitExceededException e) {
-            throw new RuntimeException(e);
         }
     }
 
     @Cacheable(value = "gitHubRepositories", key = "#username")
     public List<GitHubRepository> getRepositoriesForUser(String username) {
-        try {
-            return restClient.get()
-                    .uri("%s/users/%s/repos".formatted(GITHUB_BASE_URL, username))
-                    .retrieve()
-                    .onStatus(status -> status.value() == 403 || status.value() == 429, (_, _) -> {throw new RateLimitExceededException();})
-                    .body(new ParameterizedTypeReference<>() {});
-        } catch(RateLimitExceededException e) {
-            throw new RuntimeException(e);
-        }
+        var retrievedRepos = retrieveRepositories(username);
+        return retrievedRepos == null ? Collections.emptyList() : retrievedRepos;
+    }
+
+    private List<GitHubRepository> retrieveRepositories(String username) {
+        return restClient.get()
+                .uri("%s/users/%s/repos".formatted(GITHUB_BASE_URL, username))
+                .retrieve()
+                .onStatus(status -> status.value() == 403 || status.value() == 429, (_, _) -> {throw new RateLimitExceededException();})
+                .body(new ParameterizedTypeReference<>() {});
     }
 }

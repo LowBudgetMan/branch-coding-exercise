@@ -58,15 +58,14 @@ client's resources, which I think makes it more obvious when the solution is tha
 
 ### RestClient
 With Spring putting the RestTemplate into maintenance mode, I figured this would be a fun opportunity to try out the new 
-RestClient for external REST calls. Unfortunately, the result is a less-than-stellar lack of tests around the GitHubClient 
-in the time I had to work on this project, and I should've thought about that before diving in. One of the main reasons 
+RestClient for external REST calls. Unfortunately, the result is a much longer timeframe to get the GitHubClient's tests 
+up and running, and I should've thought about that before diving in. One of the main reasons 
 for that is the change to chainable methods versus the old RestTemplate interface. Because of the way RestClient needs 
 its methods chained, the old way I used to use Mockito to just mock the response object is much more complicated. On the 
 one hand, it's probably a good thing to require a mock server instead to push the edge of the application further out in 
-testing, but on the other it means a much, _much_ more complicated test setup to achieve the same level of thoroughness. 
-I talked about this a bit in the chat on the pros and cons of Test Driven Development, and this is one of those times when
-a lack of familiarity with a technology can cause the technique to negatively impact the speed of development (in other 
-circumstances I would've spent much more time to get it working, and then I'd be much quicker going forward). The other
+testing, but on the other it means a less familiar test setup to achieve the same level of thoroughness. I talked about 
+this a bit during the chat on the pros and cons of Test Driven Development, and this is one of those times when
+a lack of familiarity with a technology can cause the technique to negatively impact the speed of development. The other
 thing that was notable to me about the RestClient is the way that response statuses can now be handled in a couple 
 different ways. One way is by calling `.toEntity()` and then the HttpStatus is available on the response object, and 
 checks can be performed against it like with the old RestTemplate, but there is also the new `.onStatus()` which allows 
