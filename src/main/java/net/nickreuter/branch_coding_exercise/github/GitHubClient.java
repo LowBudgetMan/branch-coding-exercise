@@ -3,6 +3,7 @@ package net.nickreuter.branch_coding_exercise.github;
 import net.nickreuter.branch_coding_exercise.github.domain.GitHubProfile;
 import net.nickreuter.branch_coding_exercise.github.domain.GitHubRepository;
 import net.nickreuter.branch_coding_exercise.github.exceptions.RateLimitExceededException;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -20,6 +21,7 @@ public class GitHubClient {
         this.restClient = restClient;
     }
 
+    @Cacheable(value = "gitHubProfile", key = "#username")
     public Optional<GitHubProfile> getProfile(String username) {
         try {
             return Optional.ofNullable(restClient.get()
@@ -35,6 +37,7 @@ public class GitHubClient {
         }
     }
 
+    @Cacheable(value = "gitHubRepositories", key = "#username")
     public List<GitHubRepository> getRepositoriesForUser(String username) {
         try {
             return restClient.get()
