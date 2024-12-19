@@ -2,6 +2,7 @@ package net.nickreuter.branch_coding_exercise.github;
 
 import net.nickreuter.branch_coding_exercise.github.domain.GitHubProfile;
 import net.nickreuter.branch_coding_exercise.github.domain.GitHubRepository;
+import net.nickreuter.branch_coding_exercise.github.exceptions.RateLimitExceededException;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -25,16 +26,24 @@ public class GitHubClient {
                 .uri("%s/users/%s".formatted(GITHUB_BASE_URL, username))
                 .retrieve()
                 .onStatus(status -> status.value() == 404, (_, _) -> {throw new IllegalArgumentException();})
+                .onStatus(status -> status.value() == 403 || status.value() == 429, (_, _) -> {throw new RateLimitExceededException();})
                 .body(GitHubProfile.class));
         } catch(IllegalArgumentException e) {
             return Optional.empty();
+        } catch(RateLimitExceededException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public List<GitHubRepository> getRepositoriesForUser(String username) {
-        return restClient.get()
-                .uri("%s/users/%s/repos".formatted(GITHUB_BASE_URL, username))
-                .retrieve()
-                .body(new ParameterizedTypeReference<>() {});
+        try {
+            return restClient.get()
+                    .uri("%s/users/%s/repos".formatted(GITHUB_BASE_URL, username))
+                    .retrieve()
+                    .onStatus(status -> status.value() == 403 || status.value() == 429, (_, _) -> {throw new RateLimitExceededException();})
+                    .body(new ParameterizedTypeReference<>() {});
+        } catch(RateLimitExceededException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
