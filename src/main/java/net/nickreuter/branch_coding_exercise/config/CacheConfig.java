@@ -16,7 +16,7 @@ public class CacheConfig {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @CacheEvict(allEntries = true, cacheNames = { "gitHubProfile", "gitHubRepositories" })
-    @Scheduled(cron = "0 */20 * * * *")
+    @Scheduled(cron = "0 0 * * * *")
     public void cacheEvict() {
         logger.debug("Cache Evicted");
     }
