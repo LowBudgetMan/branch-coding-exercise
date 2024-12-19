@@ -2,6 +2,7 @@ package net.nickreuter.branch_coding_exercise.userprofile;
 
 import net.nickreuter.branch_coding_exercise.userprofile.domain.CodeRepository;
 import net.nickreuter.branch_coding_exercise.userprofile.domain.UserProfile;
+import net.nickreuter.branch_coding_exercise.userprofile.exceptions.UserProfileNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -52,5 +53,14 @@ class UserProfileControllerTest {
                 .andExpect(jsonPath("$.repos.[0].url").value("http://this.is.a/repo/1"))
                 .andExpect(jsonPath("$.repos.[1].name").value("repo2"))
                 .andExpect(jsonPath("$.repos.[1].url").value("http://this.is.a/repo/2"));
+    }
+
+    @Test
+    void getUserProfile_WhenServiceThrowsUserProfileNotFound_Returns404() throws Exception {
+        var username = "octocat";
+        when(userProfileService.getUserProfile(username)).thenThrow(UserProfileNotFoundException.class);
+
+        mockMvc.perform(get("/api/user-profile/%s".formatted(username)))
+                .andExpect(status().isNotFound());
     }
 }

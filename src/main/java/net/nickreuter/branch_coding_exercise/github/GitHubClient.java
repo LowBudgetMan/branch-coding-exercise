@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class GitHubClient {
@@ -18,11 +19,16 @@ public class GitHubClient {
         this.restClient = restClient;
     }
 
-    public GitHubProfile getProfile(String username) {
-        return restClient.get()
+    public Optional<GitHubProfile> getProfile(String username) {
+        try {
+            return Optional.ofNullable(restClient.get()
                 .uri("%s/users/%s".formatted(GITHUB_BASE_URL, username))
                 .retrieve()
-                .body(GitHubProfile.class);
+                .onStatus(status -> status.value() == 404, (_, _) -> {throw new IllegalArgumentException();})
+                .body(GitHubProfile.class));
+        } catch(IllegalArgumentException e) {
+            return Optional.empty();
+        }
     }
 
     public List<GitHubRepository> getRepositoriesForUser(String username) {
