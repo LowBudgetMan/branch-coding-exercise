@@ -1,12 +1,12 @@
 package net.nickreuter.branch_coding_exercise.github.domain;
 
-import java.net.URL;
+import java.net.URI;
 import java.time.Instant;
 
 public record GitHubProfile (
         String login,
-        URL avatar_url,
-        URL html_url,
+        URI avatar_url,
+        URI html_url,
         String name,
         String location,
         String email,

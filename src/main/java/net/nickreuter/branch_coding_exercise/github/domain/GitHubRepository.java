@@ -1,8 +1,8 @@
 package net.nickreuter.branch_coding_exercise.github.domain;
 
-import java.net.URL;
+import java.net.URI;
 
 public record GitHubRepository(
         String name,
-        URL html_url
+        URI html_url
 ) {}
